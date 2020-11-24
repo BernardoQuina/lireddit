@@ -16,7 +16,6 @@ import cors from 'cors'
 
 
 const main = async () => {
-  console.log('dirname', __dirname)
   const orm = await MikroORM.init(microConfig)
   await orm.getMigrator().up()
   
