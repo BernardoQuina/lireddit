@@ -5,7 +5,8 @@ import {
   MeQuery,
   MeDocument,
   LoginMutation,
-  RegisterMutation
+  RegisterMutation,
+  ChangePasswordMutation
 } from '../generated/graphql'
 
 import { betterUpdateQuery } from './betterUpdateQuery'
@@ -56,6 +57,22 @@ export const createUrqlClient = (ssrExchange: any) => ({
                 } else {
                   return {
                     me: result.register.user
+                  }
+                }
+              }
+            )
+          },
+          changePassword: (_result, args, cache, info) => {
+            betterUpdateQuery<ChangePasswordMutation, MeQuery>(
+              cache,
+              {query: MeDocument},
+              _result,
+              (result, query) => {
+                if (result.changePassword.errors) {
+                  return query
+                } else {
+                  return {
+                    me: result.changePassword.user
                   }
                 }
               }

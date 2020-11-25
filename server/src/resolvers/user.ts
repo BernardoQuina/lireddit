@@ -11,9 +11,11 @@ import {
 } from 'type-graphql'
 import argon2 from 'argon2'
 import { EntityManager } from '@mikro-orm/postgresql'
-import { COOKIE_NAME } from '../constants'
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from '../constants'
 import { UsernamePasswordInput } from './UsernamePasswordInput'
 import { validateRegister } from '../utils/validateRegister'
+import { sendEmail } from '../utils/sendEmail'
+import { v4 } from 'uuid'
 
 @ObjectType()
 class FieldError {
@@ -27,20 +29,87 @@ class FieldError {
 @ObjectType()
 class UserResponse {
   @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[]
+  errors?: FieldError[];
 
   @Field(() => User, { nullable: true })
-  user?: User
+  user?: User;
 }
 
 @Resolver()
 export class UserResolver {
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg('token') token: string,
+    @Arg('newPassword') newPassword: string,
+    @Ctx() { redis, em, req }: MyContext
+  ): Promise<UserResponse> {
+
+    if(newPassword.length < 8) {
+      return { errors: [{
+        field: 'newPassword',
+        message: 'length must be at least 8 characters long'
+      }]}
+    }
+
+    const key = FORGET_PASSWORD_PREFIX + token
+    const userId = await redis.get(key)
+    console.log(userId)
+
+    if (!userId) {
+      return  { errors: [{
+        field: 'token',
+        message: 'token expired'
+      }]}
+    }
+
+    const user = await em.findOneOrFail(User,{ id: parseInt(userId) })
+
+    if(!user) {
+      return { errors: [{
+        field: 'token',
+        message: 'user no longer exists'
+      }]}
+    }
+
+    user.password = await argon2.hash(newPassword)
+    await em.persistAndFlush(user)
+
+    redis.del(key)
+
+    // log in user after change password
+    req.session.userId = user.id
+
+    return { user }
+  }
+
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg('email') email: string,
-    @Ctx() { em } : MyContext
+    @Ctx() { em, redis } : MyContext
   ) {
-    // const user = await em.findOne(User, { email })
+    const user = await em.findOne(User, { email })
+    
+    if (!user) {
+      // the email is not in the db
+      return true
+    }
+
+    const token = v4()
+    
+    await redis.set(
+      FORGET_PASSWORD_PREFIX + token,
+      user.id,
+      'ex',
+      1000 * 60 * 60 * 24 * 3 // Expires in 3 days
+    )
+
+    
+    
+    await sendEmail(
+      email,
+      `<a href="http://localhost:3000/change-password/${token}">reset password</a>`
+    )
+
     return true
   }
 
@@ -86,7 +155,6 @@ export class UserResolver {
 
       user = result[0]
     } catch (err) {
-      console.log(err)
       if(err.detail.includes('already exists') && err.detail.includes('username')) {
         // duplicate username or email error
         return {
@@ -139,7 +207,7 @@ export class UserResolver {
     if(!valid) {
       return {
         errors: [{
-          field: 'password',
+          field: 'usernameOrEmail',
           message: 'Invalid login'
         }]
       }
