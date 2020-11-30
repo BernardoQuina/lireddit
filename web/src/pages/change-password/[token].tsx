@@ -54,8 +54,16 @@ const ChangePassword: NextPage = () => {
                   {tokenError}
                 </Box>
                 <NextLink href='/forgot-password'>
-                  <Link>
-                    click here to get new one
+                  <Link ml='auto'>
+                    <Button
+                      size='sm'
+                      type='button'
+                      mt={2}
+                      colorScheme='teal'
+                      shadow='md'
+                    >
+                      click here to get new one
+                    </Button>
                   </Link>
                 </NextLink>
                 

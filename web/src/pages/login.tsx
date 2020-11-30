@@ -58,6 +58,7 @@ const Login: React.FC<registerProps> = ({}) => {
               isLoading={ isSubmitting }
               mt={2}
               colorScheme='teal'
+              shadow='md'
             >
               Login
             </Button>
