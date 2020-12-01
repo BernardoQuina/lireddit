@@ -8,14 +8,14 @@ import { useState } from 'react'
 
 const Index = () => {
   const [variables, setVariables] = useState({
-    limit: 10, cursor: null as null | string
+    limit: 50, cursor: null as null | string
   })
 
   const [{ data, fetching }] = usePostsQuery({
     variables
   })
 
-  console.log(variables)
+  console.log('variables: ',variables)
 
   if (!fetching && !data) {
     return <div> oops! looks like query failed for some reason  </div>
@@ -43,7 +43,7 @@ const Index = () => {
         <div>loading...</div>
       ) : (
         <Stack spacing={8} mb={10}>
-          {data!.posts.map(p => (
+          {data!.posts.posts.map(p => (
             <Box key={p.id} p={5} shadow='md' borderRadius='10px' >
               <Heading fontSize='xl'>{p.title}</Heading>
               <Text mt={4}>
@@ -57,12 +57,12 @@ const Index = () => {
           ))}
         </Stack>
       )}
-      {data ? (
+      {data && data.posts.hasMore ? (
         <Flex>
           <Button
             onClick={() => {setVariables({
               limit: variables.limit,
-              cursor: data.posts[data.posts.length -1].createdAt
+              cursor: data.posts.posts[data.posts.posts.length -1].createdAt
             })}}
             isLoading={fetching}
             colorScheme='teal'
@@ -73,7 +73,19 @@ const Index = () => {
             Load more
           </Button>
         </Flex>
-      ) : null}
+      ) : (
+        <Flex>
+          <Button
+            disabled
+            colorScheme='gray'
+            shadow='md'
+            m='auto'
+            mb={8}
+          >
+            No more posts
+          </Button>
+        </Flex>
+      )}
     </Layout>
   )
 }
