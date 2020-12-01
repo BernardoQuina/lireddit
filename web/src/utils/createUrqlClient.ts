@@ -1,5 +1,5 @@
-import { cacheExchange } from '@urql/exchange-graphcache'
-import { dedupExchange, Exchange, fetchExchange } from 'urql'
+import { cacheExchange, Resolver } from '@urql/exchange-graphcache'
+import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from 'urql'
 import { pipe, tap } from 'wonka'
 import {
   ChangePasswordMutation,
@@ -24,6 +24,38 @@ const errorExchange: Exchange = ({ forward }) => ops$ => {
 }
 
 
+const cursorPagination = (): Resolver => {
+  return (_parent, fieldArgs, cache, info) => {
+    const { parentKey: entityKey, fieldName } = info
+
+    const allFields = cache.inspectFields(entityKey)
+    console.log('allFields: ', allFields)
+    const fieldInfos = allFields.filter((info) => info.fieldName === fieldName)
+    const size = fieldInfos.length
+    
+    if (size === 0) {
+      return undefined
+    }
+
+    // Check if data is in the cache and return it
+
+    const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`
+
+    const isItInTheCache = cache.resolveFieldByKey(entityKey, fieldKey)
+    console.log('isItInTheCache: ', isItInTheCache)
+    info.partial = !isItInTheCache
+    const results: string[] = []
+
+    fieldInfos.forEach((fi) => {
+      const data = cache.resolveFieldByKey(entityKey, fi.fieldKey) as string[]
+      results.push(...data)
+    })
+
+    return results
+  }
+}
+
+
 export const createUrqlClient = (ssrExchange: any) => ({
   url: 'http://localhost:4000/graphql',
   fetchOptions: {
@@ -32,6 +64,11 @@ export const createUrqlClient = (ssrExchange: any) => ({
   exchanges: [
     dedupExchange,
     cacheExchange({
+      resolvers: {
+        Query: {
+          posts: cursorPagination()
+        }
+      },
       updates: {
         Mutation: {
           logout: (result, args, cache, info) => {
@@ -74,22 +111,22 @@ export const createUrqlClient = (ssrExchange: any) => ({
               }
             )
           },
-          changePassword: (_result, args, cache, info) => {
-            betterUpdateQuery<ChangePasswordMutation, MeQuery>(
-              cache,
-              {query: MeDocument},
-              _result,
-              (result, query) => {
-                if (result.changePassword.errors) {
-                  return query
-                } else {
-                  return {
-                    me: result.changePassword.user
-                  }
-                }
-              }
-            )
-          }
+          // changePassword: (_result, args, cache, info) => {
+          //   betterUpdateQuery<ChangePasswordMutation, MeQuery>(
+          //     cache,
+          //     {query: MeDocument},
+          //     _result,
+          //     (result, query) => {
+          //       if (result.changePassword.errors) {
+          //         return query
+          //       } else {
+          //         return {
+          //           me: result.changePassword.user
+          //         }
+          //       }
+          //     }
+          //   )
+          // }
         }
       }
     }),
