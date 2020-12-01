@@ -29,7 +29,6 @@ const cursorPagination = (): Resolver => {
     const { parentKey: entityKey, fieldName } = info
 
     const allFields = cache.inspectFields(entityKey)
-    console.log('allFields: ', allFields)
     const fieldInfos = allFields.filter((info) => info.fieldName === fieldName)
     const size = fieldInfos.length
     
@@ -46,7 +45,6 @@ const cursorPagination = (): Resolver => {
       'posts'
     )
 
-    console.log('isItInTheCache: ', isItInTheCache)
     info.partial = !isItInTheCache
 
     let hasMore = true

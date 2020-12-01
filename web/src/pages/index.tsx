@@ -8,14 +8,12 @@ import { useState } from 'react'
 
 const Index = () => {
   const [variables, setVariables] = useState({
-    limit: 50, cursor: null as null | string
+    limit: 20, cursor: null as null | string
   })
 
   const [{ data, fetching }] = usePostsQuery({
     variables
   })
-
-  console.log('variables: ',variables)
 
   if (!fetching && !data) {
     return <div> oops! looks like query failed for some reason  </div>
