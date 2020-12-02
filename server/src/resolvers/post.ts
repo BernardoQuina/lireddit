@@ -4,7 +4,6 @@ import {
   Ctx,
   Field,
   FieldResolver,
-  Info,
   InputType,
   Int,
   Mutation,
@@ -40,7 +39,7 @@ export class PostResolver {
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 100)
   }
-
+  
 
   @Query(() => PaginatedPosts)
   async posts(
