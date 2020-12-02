@@ -3,6 +3,7 @@ import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from 'urql
 import { pipe, tap } from 'wonka'
 import {
   ChangePasswordMutation,
+  CreatePostMutation,
   LoginMutation,
   LogoutMutation,
   MeDocument,
@@ -88,6 +89,14 @@ export const createUrqlClient = (ssrExchange: any) => ({
       },
       updates: {
         Mutation: {
+          createPost: (_result, args, cache, info) => {
+            const allFields = cache.inspectFields('Query')
+            const fieldInfos = allFields.filter(info => info.fieldName === 'posts')
+            fieldInfos.forEach((fi) => {
+              cache.invalidate('Query', 'posts', fi.arguments || {})
+            })
+            
+          },
           logout: (result, args, cache, info) => {
             betterUpdateQuery<LogoutMutation, MeQuery>(
               cache,

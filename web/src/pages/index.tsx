@@ -43,12 +43,22 @@ const Index = () => {
         <Stack spacing={8} mb={10}>
           {data!.posts.posts.map(p => (
             <Box key={p.id} p={5} shadow='md' borderRadius='10px' >
-              <Heading fontSize='xl'>{p.title}</Heading>
+              <Flex align='baseline'>
+                <Heading fontSize='xl'>{p.title}</Heading>
+                <Text
+                  ml={3}
+                  fontSize='s'
+                  color='gray.500'
+                >
+                  Posted by {p.creator.username}
+                </Text>
+              </Flex>
+              
               <Text mt={4}>
-                {p.text.length > 100 ? (
+                {p.textSnippet.length === 100 ? (
                   p.textSnippet + '...'
                 ) : (
-                  p.text
+                  p.textSnippet
                 )}
                 </Text>
             </Box>
