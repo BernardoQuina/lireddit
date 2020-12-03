@@ -1,10 +1,13 @@
+import { AddIcon } from '@chakra-ui/icons'
+import { Box, Button, Flex, Heading, IconButton, Link, Stack, Text } from '@chakra-ui/react'
 import { withUrqlClient } from 'next-urql'
-import { Box, Button, Flex, Heading, Link, Stack, Text } from '@chakra-ui/react'
 import NextLink from 'next/link'
+import React, { useState } from 'react'
 import { Layout } from '../components/Layout'
+import { PostSection } from '../components/PostSnippet/PostSection'
+import { UpdootSection } from '../components/PostSnippet/UpdootSection'
 import { usePostsQuery } from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
-import { useState } from 'react'
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -30,7 +33,7 @@ const Index = () => {
               colorScheme='teal'
               shadow='md'
             >
-              Create post
+              Post <AddIcon ml={2} v={3} h={3} />
             </Button>
           </Link>
         </NextLink>
@@ -42,26 +45,10 @@ const Index = () => {
       ) : (
         <Stack spacing={8} mb={10}>
           {data!.posts.posts.map(p => (
-            <Box key={p.id} p={5} shadow='md' borderRadius='10px' >
-              <Flex align='baseline'>
-                <Heading fontSize='xl'>{p.title}</Heading>
-                <Text
-                  ml={3}
-                  fontSize='s'
-                  color='gray.500'
-                >
-                  Posted by {p.creator.username}
-                </Text>
-              </Flex>
-              
-              <Text mt={4}>
-                {p.textSnippet.length === 100 ? (
-                  p.textSnippet + '...'
-                ) : (
-                  p.textSnippet
-                )}
-                </Text>
-            </Box>
+            <Flex key={p.id} p={5} shadow='md' borderRadius='10px' >
+              <UpdootSection post={p} />
+              <PostSection post={p} />
+            </Flex>
           ))}
         </Stack>
       )}
