@@ -8,8 +8,6 @@ interface UpdootSectionProps {
 }
 
 export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
-  const [upVariant, setUpVariant] = useState('outline') as any
-  const [downVariant, setDownVariant] = useState('outline') as any
   const [, vote] = useVoteMutation()
 
   return (
@@ -17,16 +15,17 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
       <IconButton
         aria-label='upVote'
         colorScheme='teal'
-        variant={upVariant}
+        variant={post.voteStatus === 1 ? null as any : 'outline'}
         shadow='md'
         w={1}
         h={6}
         padding={0}
         icon={<ChevronUpIcon w={6} h={6} />}
-        onClick={() => {
-          vote({ postId: post.id, value: 1 })
-          setUpVariant(null)
-          setDownVariant('outline')
+        onClick={async () => {
+          if (post.voteStatus === 1) {
+            return
+          }
+          await vote({ postId: post.id, value: 1 })
         }}
       />
       
@@ -35,16 +34,17 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
       <IconButton
         aria-label='downVote'
         colorScheme='teal'
-        variant= {downVariant}
+        variant= {post.voteStatus === -1 ? null as any : 'outline'}
         shadow='md'
         w={1}
         h={6}
         padding={0}
         icon={<ChevronDownIcon w={6} h={6} />}
         onClick={async () => {
+          if (post.voteStatus === -1) {
+            return
+          }
           await vote({ postId: post.id, value: -1 })
-          setDownVariant(null)
-          setUpVariant('outline')
         }}
       />
     </Flex>
