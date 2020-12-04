@@ -25,7 +25,6 @@ const Index = () => {
   return (
     <Layout>
       <Flex>
-        <Heading>LiReddit</Heading>
         <NextLink href='/create-post'>
           <Link ml='auto'>
             <Button

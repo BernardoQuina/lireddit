@@ -28,7 +28,7 @@ export type QueryPostsArgs = {
 
 
 export type QueryPostArgs = {
-  id: Scalars['Float'];
+  id: Scalars['Int'];
 };
 
 export type PaginatedPosts = {
@@ -282,6 +282,23 @@ export type PostsQuery = (
   ) }
 );
 
+export type SinglePostQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type SinglePostQuery = (
+  { __typename?: 'Query' }
+  & { post?: Maybe<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'text' | 'points'>
+    & { creator: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+    ) }
+  )> }
+);
+
 export const PostSnippetFragmentDoc = gql`
     fragment PostSnippet on Post {
   id
@@ -419,4 +436,24 @@ export const PostsDocument = gql`
 
 export function usePostsQuery(options: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<PostsQuery>({ query: PostsDocument, ...options });
+};
+export const SinglePostDocument = gql`
+    query SinglePost($id: Int!) {
+  post(id: $id) {
+    id
+    createdAt
+    updatedAt
+    title
+    text
+    points
+    creator {
+      id
+      username
+    }
+  }
+}
+    `;
+
+export function useSinglePostQuery(options: Omit<Urql.UseQueryArgs<SinglePostQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<SinglePostQuery>({ query: SinglePostDocument, ...options });
 };
