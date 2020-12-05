@@ -24,21 +24,6 @@ const Index = () => {
 
   return (
     <Layout>
-      <Flex>
-        <NextLink href='/create-post'>
-          <Link ml='auto'>
-            <Button
-              type='button'
-              colorScheme='teal'
-              shadow='md'
-            >
-              Post <AddIcon ml={2} v={3} h={3} />
-            </Button>
-          </Link>
-        </NextLink>
-      </Flex>
-      
-      <br />
       {!data && fetching ? (
         <div>loading...</div>
       ) : (
