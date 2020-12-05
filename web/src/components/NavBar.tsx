@@ -92,7 +92,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   }
 
   return (
-    <Flex zIndex={1} position='sticky' top={0} p={4} bg='teal.500'>
+    <Flex shadow='xl' zIndex={1} position='sticky' top={0} p={4} bg='teal.500'>
       <Flex flex={1} m='auto' align='center' maxW={1000}>
         <NextLink href='/'>
           <Link style={{ textDecoration: 'none' }}>
