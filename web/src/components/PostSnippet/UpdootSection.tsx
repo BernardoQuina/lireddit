@@ -16,6 +16,7 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
         aria-label='upVote'
         colorScheme='teal'
         variant={post.voteStatus === 1 ? null as any : 'outline'}
+        border='none'
         shadow='md'
         w={1}
         h={6}
@@ -35,6 +36,7 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
         aria-label='downVote'
         colorScheme='teal'
         variant= {post.voteStatus === -1 ? null as any : 'outline'}
+        border='none'
         shadow='md'
         w={1}
         h={6}

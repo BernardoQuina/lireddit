@@ -1,9 +1,10 @@
-import { DeleteIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { Box, Flex, Heading, Text, Link, IconButton } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import React from 'react'
 import { PostSnippetFragment, useDeletePostMutation, useMeQuery } from '../../generated/graphql'
 import { isServer } from '../../utils/isServer'
+import { EditDeletePostButtons } from '../EditDeletePostButtons'
 
 interface PostSectionProps {
   post: PostSnippetFragment
@@ -45,21 +46,11 @@ export const PostSection: React.FC<PostSectionProps> = ({ post }) => {
           )}
         </Text>
       </Box>
-      
-      <Flex ml='auto'>
-        <IconButton
-          hidden={data?.me?.id !== post.creator.id}
-          icon={<DeleteIcon />}
-          h={9}
-          shadow='md'
-          aria-label='Delete Post'
-          colorScheme='red'
-          variant='outline'
-          opacity={0.8}
-          onClick={() => deletePost({ id: post.id })}
-        />
-      </Flex>
-      
+      <EditDeletePostButtons
+        ml='auto'
+        creatorId={post.creator.id}
+        id={post.id}
+      />
     </Flex>
   )
 }
