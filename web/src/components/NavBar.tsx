@@ -21,8 +21,8 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   const isInLogin = router.pathname === '/login'
   const isInRegister = router.pathname === '/register'
 
-  const logoutHandler = () => {
-    logout()
+  const logoutHandler = async () => {
+    await logout()
     router.push('/login')
   }
 
