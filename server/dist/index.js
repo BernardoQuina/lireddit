@@ -37,16 +37,16 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         type: 'postgres',
         url: process.env.DATABASE_URL,
         logging: true,
-        synchronize: true,
         migrations: [path_1.default.join(__dirname, './migrations/*')],
         entities: [Post_1.Post, User_1.User, Updoot_1.Updoot]
     });
     yield conn.runMigrations();
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
-    const redis = new ioredis_1.default();
+    const redis = new ioredis_1.default(process.env.REDIS_URL);
+    app.set('proxy', 1);
     app.use(cors_1.default({
-        origin: 'http://localhost:3000',
+        origin: process.env.CORS_ORIGIN,
         credentials: true
     }));
     app.use(express_session_1.default({
@@ -60,8 +60,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             sameSite: 'lax',
             secure: constants_1.__prod__,
+            domain: constants_1.__prod__ ? '.codeponder.com' : undefined
         },
-        secret: 'fdhgsdfhghsgfdhsjsgswldfh',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false
     }));
@@ -82,8 +83,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.get('/', (_, res) => {
         res.send('hello world');
     });
-    app.listen(4000, () => {
-        console.log('server started on localhost:4000');
+    app.listen(parseInt(process.env.PORT), () => {
+        console.log(`server started on port:${process.env.PORT}`);
     });
 });
 main().catch(err => {
