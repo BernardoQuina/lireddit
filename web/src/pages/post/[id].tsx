@@ -1,18 +1,16 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
-import { withUrqlClient } from 'next-urql'
 import { useRouter } from 'next/router'
 import { EditDeletePostButtons } from '../../components/EditDeletePostButtons'
 import { Layout } from '../../components/Layout'
-import { createUrqlClient } from '../../utils/createUrqlClient'
 import { useGetPostFromUrl } from '../../utils/useGetPostFromUrl'
 
 
 const Post = ({}) => {
   const router = useRouter()
   const intId = typeof router.query.id === 'string' ? parseInt(router.query.id) : -1
-  const [{data, fetching}] = useGetPostFromUrl()
+  const {data, loading} = useGetPostFromUrl()
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <div>
@@ -57,4 +55,4 @@ const Post = ({}) => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, {ssr: true})(Post)
+export default Post

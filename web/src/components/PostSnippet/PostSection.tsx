@@ -1,5 +1,4 @@
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import { Box, Flex, Heading, Text, Link, IconButton } from '@chakra-ui/react'
+import { Box, Flex, Heading, Text, Link } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import React from 'react'
 import { PostSnippetFragment, useDeletePostMutation, useMeQuery } from '../../generated/graphql'
@@ -12,8 +11,8 @@ interface PostSectionProps {
 
 export const PostSection: React.FC<PostSectionProps> = ({ post }) => {
 
-  const [{ data }] = useMeQuery({
-    pause: isServer()
+  const { data } = useMeQuery({
+    skip: isServer()
   })
 
   const [, deletePost] = useDeletePostMutation()

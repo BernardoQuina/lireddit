@@ -19,9 +19,9 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
 }) => {
   const router = useRouter()
 
-  const [{ data }] = useMeQuery({ pause: isServer() })
+  const { data } = useMeQuery({ skip: isServer() })
 
-  const [, deletePost] = useDeletePostMutation()
+  const [deletePost] = useDeletePostMutation()
 
   if(data?.me?.id !== creatorId) {
     return null
@@ -54,7 +54,7 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
         variant='outline'
         opacity={0.8}
         onClick={() => {
-          deletePost({ id })
+          deletePost({ variables: { id } })
           if(router.pathname !== '/') {
             router.back()
           }

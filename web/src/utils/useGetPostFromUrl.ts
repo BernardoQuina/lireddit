@@ -8,7 +8,7 @@ export const useGetPostFromUrl = () => {
   const intId = useGetIntId()
 
   return useSinglePostQuery({
-    pause: intId === -1,
+    skip: intId === -1,
     variables: {
       id: intId
     }

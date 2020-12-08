@@ -1,6 +1,6 @@
 import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { Flex, IconButton, Text } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React from 'react'
 import { PostSnippetFragment, useVoteMutation } from '../../generated/graphql'
 
 interface UpdootSectionProps {
@@ -8,7 +8,7 @@ interface UpdootSectionProps {
 }
 
 export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
-  const [, vote] = useVoteMutation()
+  const [vote] = useVoteMutation()
 
   return (
     <Flex direction='column' alignItems='center' justifyContent='center' mr={4}>
@@ -26,7 +26,7 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
           if (post.voteStatus === 1) {
             return
           }
-          await vote({ postId: post.id, value: 1 })
+          await vote({ variables: { postId: post.id, value: 1 }})
         }}
       />
       
@@ -46,7 +46,7 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
           if (post.voteStatus === -1) {
             return
           }
-          await vote({ postId: post.id, value: -1 })
+          await vote({ variables: { postId: post.id, value: -1 } })
         }}
       />
     </Flex>

@@ -1,34 +1,31 @@
-import { AddIcon } from '@chakra-ui/icons'
 import { Box, Button, Flex, Heading, IconButton, Link, Stack, Text } from '@chakra-ui/react'
-import { withUrqlClient } from 'next-urql'
-import NextLink from 'next/link'
 import React, { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { PostSection } from '../components/PostSnippet/PostSection'
 import { UpdootSection } from '../components/PostSnippet/UpdootSection'
-import { usePostsQuery } from '../generated/graphql'
-import { createUrqlClient } from '../utils/createUrqlClient'
+import { PostsQuery, usePostsQuery } from '../generated/graphql'
 
 const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: 20, cursor: null as null | string
-  })
 
-  const [{ data, fetching, error }] = usePostsQuery({
-    variables
+  const { data, loading, error, fetchMore, variables } = usePostsQuery({
+    variables: {
+      limit: 20,
+      cursor: null as null | string
+    },
+    notifyOnNetworkStatusChange: true
   })
 
   if(error) {
     return <Text>{error.message}</Text>
   }
 
-  if (!fetching && !data) {
+  if (!loading && !data) {
     return <div> oops! looks like query failed for some reason  </div>
   }
 
   return (
     <Layout>
-      {!data && fetching ? (
+      {!data && loading ? (
         <div>loading...</div>
       ) : (
         <Stack spacing={8} mb={10}>
@@ -43,11 +40,36 @@ const Index = () => {
       {data && data.posts.hasMore ? (
         <Flex>
           <Button
-            onClick={() => {setVariables({
-              limit: variables.limit,
-              cursor: data.posts.posts[data.posts.posts.length -1].createdAt
-            })}}
-            isLoading={fetching}
+            onClick={() => {
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  cursor: data.posts.posts[data.posts.posts.length -1].createdAt
+                },
+                // updateQuery: (
+                //   previousValue, 
+                //   {fetchMoreResult}
+                // ): PostsQuery => {
+                //   if (!fetchMoreResult) {
+                //     return previousValue as PostsQuery
+                //   }
+
+                //   return {
+                //     __typename: 'Query',
+                //     posts: {
+                //       __typename: 'PaginatedPosts',
+                //       hasMore: (fetchMoreResult as PostsQuery).posts.hasMore,
+                //       posts: [
+                //         ...(previousValue as PostsQuery).posts.posts,
+                //         ...(fetchMoreResult as PostsQuery).posts.posts
+                //       ]
+                //     },
+
+                //   }
+                // }
+              })
+            }}
+            isLoading={loading}
             colorScheme='teal'
             shadow='md'
             m='auto'
@@ -73,4 +95,4 @@ const Index = () => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, {ssr: true})(Index)
+export default Index

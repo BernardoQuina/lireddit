@@ -1,12 +1,10 @@
 import { Box, Button, Heading, Text } from '@chakra-ui/react'
 import { Formik, Form } from 'formik'
-import { withUrqlClient } from 'next-urql'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { InputField } from '../../../components/InputField'
 import { Layout } from '../../../components/Layout'
 import { useMeQuery, useUpdatePostMutation } from '../../../generated/graphql'
-import { createUrqlClient } from '../../../utils/createUrqlClient'
 import { isServer } from '../../../utils/isServer'
 import { useGetIntId } from '../../../utils/useGetIntId'
 import { useGetPostFromUrl } from '../../../utils/useGetPostFromUrl'
@@ -14,14 +12,14 @@ import { useGetPostFromUrl } from '../../../utils/useGetPostFromUrl'
 export const EditPost = ({}) => {
   const router = useRouter()
 
-  const [{ data: meData }] = useMeQuery({ pause: isServer() })
+  const { data: meData } = useMeQuery({ skip: isServer() })
 
-  const [{ data: postData, fetching }] = useGetPostFromUrl()
+  const { data: postData, loading } = useGetPostFromUrl()
   const intId = useGetIntId()
 
-  const [, updatePost] = useUpdatePostMutation()
+  const [updatePost] = useUpdatePostMutation()
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <div>loading...</div>
@@ -47,7 +45,7 @@ export const EditPost = ({}) => {
       <Formik
         initialValues={{ title: postData.post.title, text: postData.post.text }}
         onSubmit={ async (values) => {
-          await updatePost({ id: intId, ...values })
+          await updatePost({ variables: { id: intId, ...values } })
           router.push(`/post/${intId}`)
         }}
       >
@@ -85,4 +83,4 @@ export const EditPost = ({}) => {
   )
 }
 
-export default withUrqlClient(createUrqlClient)(EditPost)
+export default EditPost

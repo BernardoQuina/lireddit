@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { useMeQuery, useLogoutMutation } from '../generated/graphql'
 import { isServer } from '../utils/isServer'
+import { useApolloClient } from '@apollo/client'
 
 interface NavBarProps {
 
@@ -12,9 +13,10 @@ interface NavBarProps {
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
   const router = useRouter()
-  const [{fetching: logoutFetching}, logout] = useLogoutMutation()
-  const [{data, fetching}] = useMeQuery({
-    pause: isServer()
+  const [logout, {loading: logoutLoading}] = useLogoutMutation()
+  const apolloClient = useApolloClient()
+  const {data, loading} = useMeQuery({
+    skip: isServer()
   })
 
   const isInCreatePost = router.pathname === '/create-post'
@@ -23,13 +25,14 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
 
   const logoutHandler = async () => {
     await logout()
-    router.push('/login')
+    await apolloClient.resetStore()
+    // router.push('/login')
   }
 
   let body = null
   
   // data is loading
-  if (fetching) {
+  if (loading) {
 
     // user not logged in
   } else if (!data?.me) {
@@ -75,7 +78,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         <Button
           ml={2}
           onClick={logoutHandler}
-          isLoading={logoutFetching}
+          isLoading={logoutLoading}
           colorScheme='teal'
           border='1px'
           borderRadius='5px'
