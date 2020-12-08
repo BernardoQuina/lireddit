@@ -40,7 +40,7 @@ const main = async () => {
   const RedisStore = connectRedis(session)
   const redis = new Redis(process.env.REDIS_URL)
 
-  app.set('proxy', 1)
+  app.set('trust proxy', 1)
   app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
@@ -58,7 +58,7 @@ const main = async () => {
         httpOnly: true,
         sameSite: 'lax', // csrf
         secure: __prod__, // cookie only works in https
-        domain: __prod__ ? '.codeponder.com' : undefined
+        domain: __prod__ ? '.bernardoquina.com' : undefined
       },
       secret: process.env.SESSION_SECRET,
       resave: false,
