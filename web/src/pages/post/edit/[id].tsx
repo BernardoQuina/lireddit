@@ -8,6 +8,7 @@ import { useMeQuery, useUpdatePostMutation } from '../../../generated/graphql'
 import { isServer } from '../../../utils/isServer'
 import { useGetIntId } from '../../../utils/useGetIntId'
 import { useGetPostFromUrl } from '../../../utils/useGetPostFromUrl'
+import { withApollo } from '../../../utils/withApollo'
 
 export const EditPost = ({}) => {
   const router = useRouter()
@@ -83,4 +84,4 @@ export const EditPost = ({}) => {
   )
 }
 
-export default EditPost
+export default withApollo({ ssr: false })(EditPost)

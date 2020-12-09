@@ -7,6 +7,7 @@ import { toErrorMap } from '../utils/toErrorMap'
 import { useRouter } from 'next/router'
 import NextLink from 'next/link'
 import { Layout } from '../components/Layout'
+import { withApollo } from '../utils/withApollo'
 
 interface registerProps {}
 
@@ -72,4 +73,4 @@ const Login: React.FC<registerProps> = ({}) => {
   )
 }
 
-export default Login
+export default withApollo({ ssr: false })(Login)

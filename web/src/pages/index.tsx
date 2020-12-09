@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout'
 import { PostSection } from '../components/PostSnippet/PostSection'
 import { UpdootSection } from '../components/PostSnippet/UpdootSection'
 import { PostsQuery, usePostsQuery } from '../generated/graphql'
+import { withApollo } from '../utils/withApollo'
 
 const Index = () => {
 
@@ -95,4 +96,4 @@ const Index = () => {
   )
 }
 
-export default Index
+export default withApollo({ ssr: true })(Index)
