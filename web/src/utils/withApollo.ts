@@ -1,9 +1,14 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
-import { withApollo as createWithApollo } from 'next-apollo'
+import { createWithApollo } from './createWithApollo'
 import { PaginatedPosts } from '../generated/graphql'
+import { NextPageContext } from 'next'
 
-const client = new ApolloClient({
+const createClient = (ctx: NextPageContext) => new ApolloClient({
   uri: process.env.NEXT_PUBLIC_API_URL as string,
+  credentials: 'include',
+  headers: {
+    cookie: (typeof window === 'undefined' ? ctx.req?.headers.cookie : undefined) || ''
+  },
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -25,7 +30,7 @@ const client = new ApolloClient({
       }
     }
   }),
-  credentials: 'include'
+  
 })
 
-export const withApollo = createWithApollo(client)
+export const withApollo = createWithApollo(createClient as any)

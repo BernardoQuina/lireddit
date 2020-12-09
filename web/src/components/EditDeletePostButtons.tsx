@@ -54,7 +54,9 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
         variant='outline'
         opacity={0.8}
         onClick={() => {
-          deletePost({ variables: { id } })
+          deletePost({ variables: { id }, update: (cache) => {
+            cache.evict({id: 'Post:' + id})
+          } })
           if(router.pathname !== '/') {
             router.back()
           }
